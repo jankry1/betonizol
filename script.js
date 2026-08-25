@@ -1,32 +1,8 @@
-const steps = [...document.querySelectorAll('.step')];
-const stage = document.querySelector('.installation-stage');
-const stageCopy = document.getElementById('stage-copy');
-const copies = {
-  1: 'Поверхности подготавливаются к монтажу.',
-  2: 'Уплотнение размещается в зоне будущего соединения.',
-  3: 'Бетонные элементы соединяются и прижимают уплотнение.',
-  4: 'Соединение герметизировано и защищено от проникновения воды.'
-};
-
-function setStep(value) {
-  stage.dataset.current = String(value);
-  stageCopy.textContent = copies[value];
-  steps.forEach(btn => btn.classList.toggle('is-active', Number(btn.dataset.step) === value));
-}
-
-steps.forEach(btn => btn.addEventListener('click', () => setStep(Number(btn.dataset.step))));
-
-let currentStep = 1;
-setInterval(() => {
-  currentStep = currentStep === 4 ? 1 : currentStep + 1;
-  setStep(currentStep);
-}, 3200);
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) entry.target.classList.add('is-visible');
-  });
-}, { threshold: 0.12 });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-document.getElementById('year').textContent = new Date().getFullYear();
+const scene=document.querySelector(".scene"),steps=[...document.querySelectorAll(".step")],progress=document.getElementById("progress"),caption=document.getElementById("caption"),play=document.getElementById("play");
+const captions=["Уплотнение устанавливается на соединительную часть бетонного кольца","Следующее бетонное кольцо плавно опускается сверху","Уплотнение сжимается между кольцами и создаёт герметичное соединение"];
+let current=0,playing=true,timer;
+function setStep(n){current=n;scene.classList.remove("step1","step2");if(n===1)scene.classList.add("step1");if(n===2)scene.classList.add("step2");steps.forEach((b,i)=>b.classList.toggle("active",i===n));progress.style.width=((n+1)/3*100)+"%";caption.textContent=captions[n]}
+function start(){clearInterval(timer);timer=setInterval(()=>setStep((current+1)%3),2600)}
+steps.forEach(b=>b.addEventListener("click",()=>{setStep(+b.dataset.step);if(playing)start()}));
+play.addEventListener("click",()=>{playing=!playing;play.textContent=playing?"Ⅱ":"▶";if(playing)start();else clearInterval(timer)});
+setStep(0);start();
